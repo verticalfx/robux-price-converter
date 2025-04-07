@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Robux Price Converter Options</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #00b06f;
+      display: flex;
+      align-items: center;
+    }
+    h1 svg {
+      margin-left: 10px;
+      width: 24px;
+      height: 24px;
+    }
+    .option-group {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="number"] {
+      width: 100px;
+      padding: 5px;
+      margin-right: 10px;
+    }
+    button {
+      background-color: #00b06f;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #009a60;
+    }
+    .status {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 4px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .info {
+      margin-top: 5px;
+      color: #666;
+      font-size: 0.9em;
+    }
+    .robux-icon {
+      vertical-align: middle;
+      margin-left: 2px;
+      width: 16px;
+      height: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Robux Price Converter Options
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 26.1">
+      <defs>
+        <style>.cls-1{fill:url(#linear-gradient);}</style>
+        <linearGradient id="linear-gradient" x1="-21.63" y1="63.75" x2="-21.63" y2="62.78" gradientTransform="matrix(24, 0, 0, -26.1, 531, 1665.03)" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#eedfa2"/>
+          <stop offset="0.59" stop-color="#a9935a"/>
+          <stop offset="1" stop-color="#fee3a5"/>
+        </linearGradient>
+      </defs>
+      <g id="Layer_2" data-name="Layer 2">
+        <g id="Web-Spritesheet">
+          <path id="path-2" class="cls-1" d="M21.4,4.62A5.2,5.2,0,0,1,24,9.12V17a5.19,5.19,0,0,1-2.6,4.5l-6.8,3.93a5.19,5.19,0,0,1-5.2,0L2.6,21.48A5.19,5.19,0,0,1,0,17V9.12a5.2,5.2,0,0,1,2.6-4.5L9.4.7a5.19,5.19,0,0,1,5.2,0ZM10.31,2.48,3.69,6.31A3.35,3.35,0,0,0,2,9.23v7.65A3.36,3.36,0,0,0,3.69,19.8l6.62,3.83a3.4,3.4,0,0,0,3.38,0l6.62-3.83A3.36,3.36,0,0,0,22,16.88V9.23a3.35,3.35,0,0,0-1.69-2.92L13.69,2.48a3.4,3.4,0,0,0-3.38,0Zm3.08,2.14,5.22,3A2.78,2.78,0,0,1,20,10v6a2.76,2.76,0,0,1-1.39,2.4l-5.22,3a2.76,2.76,0,0,1-2.78,0l-5.22-3A2.76,2.76,0,0,1,4,16.07V10A2.78,2.78,0,0,1,5.39,7.63l5.22-3a2.76,2.76,0,0,1,2.78,0ZM9,16.05h6v-6H9Z"/>
+        </g>
+      </g>
+    </svg>
+  </h1>
+  
+  <div class="option-group">
+    <h2>Conversion Rate Settings</h2>
+    
+    <div>
+      <label for="robuxAmount">Robux Amount:</label>
+      <input type="number" id="robuxAmount" min="1" step="1">
+      <span>
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 26.1" class="robux-icon">
+          <defs>
+            <style>.cls-1{fill:url(#linear-gradient-icon);}</style>
+            <linearGradient id="linear-gradient-icon" x1="-21.63" y1="63.75" x2="-21.63" y2="62.78" gradientTransform="matrix(24, 0, 0, -26.1, 531, 1665.03)" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#eedfa2"/>
+              <stop offset="0.59" stop-color="#a9935a"/>
+              <stop offset="1" stop-color="#fee3a5"/>
+            </linearGradient>
+          </defs>
+          <g>
+            <g>
+              <path class="cls-1" d="M21.4,4.62A5.2,5.2,0,0,1,24,9.12V17a5.19,5.19,0,0,1-2.6,4.5l-6.8,3.93a5.19,5.19,0,0,1-5.2,0L2.6,21.48A5.19,5.19,0,0,1,0,17V9.12a5.2,5.2,0,0,1,2.6-4.5L9.4.7a5.19,5.19,0,0,1,5.2,0ZM10.31,2.48,3.69,6.31A3.35,3.35,0,0,0,2,9.23v7.65A3.36,3.36,0,0,0,3.69,19.8l6.62,3.83a3.4,3.4,0,0,0,3.38,0l6.62-3.83A3.36,3.36,0,0,0,22,16.88V9.23a3.35,3.35,0,0,0-1.69-2.92L13.69,2.48a3.4,3.4,0,0,0-3.38,0Zm3.08,2.14,5.22,3A2.78,2.78,0,0,1,20,10v6a2.76,2.76,0,0,1-1.39,2.4l-5.22,3a2.76,2.76,0,0,1-2.78,0l-5.22-3A2.76,2.76,0,0,1,4,16.07V10A2.78,2.78,0,0,1,5.39,7.63l5.22-3a2.76,2.76,0,0,1,2.78,0ZM9,16.05h6v-6H9Z"/>
+            </g>
+          </g>
+        </svg>
+      </span>
+    </div>
+    
+    <div style="margin-top: 10px;">
+      <label for="dollarAmount">Equals to USD Amount:</label>
+      <input type="number" id="dollarAmount" min="0.01" step="0.01">
+      <span>USD</span>
+    </div>
+    
+    <div class="info">
+      Default: 1000 
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 26.1" class="robux-icon">
+        <defs>
+          <style>.cls-1{fill:url(#linear-gradient-info);}</style>
+          <linearGradient id="linear-gradient-info" x1="-21.63" y1="63.75" x2="-21.63" y2="62.78" gradientTransform="matrix(24, 0, 0, -26.1, 531, 1665.03)" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#eedfa2"/>
+            <stop offset="0.59" stop-color="#a9935a"/>
+            <stop offset="1" stop-color="#fee3a5"/>
+          </linearGradient>
+        </defs>
+        <g>
+          <g>
+            <path class="cls-1" d="M21.4,4.62A5.2,5.2,0,0,1,24,9.12V17a5.19,5.19,0,0,1-2.6,4.5l-6.8,3.93a5.19,5.19,0,0,1-5.2,0L2.6,21.48A5.19,5.19,0,0,1,0,17V9.12a5.2,5.2,0,0,1,2.6-4.5L9.4.7a5.19,5.19,0,0,1,5.2,0ZM10.31,2.48,3.69,6.31A3.35,3.35,0,0,0,2,9.23v7.65A3.36,3.36,0,0,0,3.69,19.8l6.62,3.83a3.4,3.4,0,0,0,3.38,0l6.62-3.83A3.36,3.36,0,0,0,22,16.88V9.23a3.35,3.35,0,0,0-1.69-2.92L13.69,2.48a3.4,3.4,0,0,0-3.38,0Zm3.08,2.14,5.22,3A2.78,2.78,0,0,1,20,10v6a2.76,2.76,0,0,1-1.39,2.4l-5.22,3a2.76,2.76,0,0,1-2.78,0l-5.22-3A2.76,2.76,0,0,1,4,16.07V10A2.78,2.78,0,0,1,5.39,7.63l5.22-3a2.76,2.76,0,0,1,2.78,0ZM9,16.05h6v-6H9Z"/>
+          </g>
+        </g>
+      </svg> = $3.5
+    </div>
+    
+    <button id="saveButton" style="margin-top: 15px;">Save Settings</button>
+    <div id="status" class="status" style="display: none;"></div>
+  </div>
+  
+  <div class="option-group">
+    <h2>About</h2>
+    <p>The Robux Price Converter allows you to see prices on websites in terms of Robux.</p>
+    <p>This can help you understand the real-world value of items in terms of the Roblox currency.</p>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html> 
