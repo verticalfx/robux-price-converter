@@ -5,6 +5,32 @@ const DEFAULT_DOLLAR_AMOUNT = 3.5;
 // Variable to store the actual conversion rate
 let robuxConversionRate = DEFAULT_ROBUX_AMOUNT / DEFAULT_DOLLAR_AMOUNT;
 
+// Immediate test of the problematic case - run this before any async code
+console.log('======== DIRECT TEST ========');
+// Set up the default conversion rate
+robuxConversionRate = DEFAULT_ROBUX_AMOUNT / DEFAULT_DOLLAR_AMOUNT;
+console.log(`Conversion rate: ${robuxConversionRate} Robux per dollar`);
+
+// Test the specific cases that were failing
+const testInput1 = '$114,799';
+console.log(`\nDirect test of "${testInput1}"`);
+// US format should have commas as thousands separators, not decimal
+let hasCommaDecimal = /,\d{2}(?!\d)/.test(testInput1);
+let hasThousandsDots = /\d{1,3}(\.\d{3})+/.test(testInput1);
+console.log(`Format detection - hasCommaDecimal: ${hasCommaDecimal}, hasThousandsDots: ${hasThousandsDots}`);
+console.log(`Is European format? ${hasCommaDecimal && hasThousandsDots}`);
+// This should be false for US format
+
+const testInput2 = '1.234,56€';
+console.log(`\nDirect test of "${testInput2}"`);
+// European format should have dots as thousands separators and comma as decimal
+hasCommaDecimal = /,\d{2}(?!\d)/.test(testInput2);
+hasThousandsDots = /\d{1,3}(\.\d{3})+/.test(testInput2);
+console.log(`Format detection - hasCommaDecimal: ${hasCommaDecimal}, hasThousandsDots: ${hasThousandsDots}`);
+console.log(`Is European format? ${hasCommaDecimal && hasThousandsDots}`);
+// This should be true for European format
+console.log('======== END DIRECT TEST ========');
+
 // Robux SVG icon as a base64 encoded string for inline usage
 const ROBUX_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 26.1" width="16" height="16" style="vertical-align: middle; margin-left: 3px;"><defs><style>.cls-1{fill:url(#linear-gradient);}</style><linearGradient id="linear-gradient" x1="-21.63" y1="63.75" x2="-21.63" y2="62.78" gradientTransform="matrix(24, 0, 0, -26.1, 531, 1665.03)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#eedfa2"/><stop offset="0.59" stop-color="#a9935a"/><stop offset="1" stop-color="#fee3a5"/></linearGradient></defs><g id="Layer_2" data-name="Layer 2"><g id="Web-Spritesheet"><path id="path-2" class="cls-1" d="M21.4,4.62A5.2,5.2,0,0,1,24,9.12V17a5.19,5.19,0,0,1-2.6,4.5l-6.8,3.93a5.19,5.19,0,0,1-5.2,0L2.6,21.48A5.19,5.19,0,0,1,0,17V9.12a5.2,5.2,0,0,1,2.6-4.5L9.4.7a5.19,5.19,0,0,1,5.2,0ZM10.31,2.48,3.69,6.31A3.35,3.35,0,0,0,2,9.23v7.65A3.36,3.36,0,0,0,3.69,19.8l6.62,3.83a3.4,3.4,0,0,0,3.38,0l6.62-3.83A3.36,3.36,0,0,0,22,16.88V9.23a3.35,3.35,0,0,0-1.69-2.92L13.69,2.48a3.4,3.4,0,0,0-3.38,0Zm3.08,2.14,5.22,3A2.78,2.78,0,0,1,20,10v6a2.76,2.76,0,0,1-1.39,2.4l-5.22,3a2.76,2.76,0,0,1-2.78,0l-5.22-3A2.76,2.76,0,0,1,4,16.07V10A2.78,2.78,0,0,1,5.39,7.63l5.22-3a2.76,2.76,0,0,1,2.78,0ZM9,16.05h6v-6H9Z"/></g></g></svg>`;
 
@@ -18,7 +44,7 @@ let sessionConversionCount = 0;
 let isProcessing = false;
 
 // Add debug mode capability
-const DEBUG_MODE = false; // Set to true to enable console logging
+const DEBUG_MODE = true; // Set to true to enable console logging
 
 // Helper function for debugging
 function debugLog(...args) {
@@ -46,11 +72,17 @@ function loadConversionRate() {
         'robuxAmount': DEFAULT_ROBUX_AMOUNT,
         'dollarAmount': DEFAULT_DOLLAR_AMOUNT
       }, function(items) {
+        // The conversion rate should be Robux per dollar
+        // So if 1000 Robux = $3.5, then 1 dollar = 1000/3.5 Robux = 285.71 Robux
         robuxConversionRate = items.robuxAmount / items.dollarAmount;
+        console.log(`Loaded conversion settings: ${items.robuxAmount} Robux = $${items.dollarAmount}`);
+        console.log(`Calculated conversion rate: $1 = ${robuxConversionRate} Robux`);
         resolve();
       });
     } else {
       // Fallback to default if storage is not available
+      robuxConversionRate = DEFAULT_ROBUX_AMOUNT / DEFAULT_DOLLAR_AMOUNT;
+      console.log(`Using default conversion rate: $1 = ${robuxConversionRate} Robux`);
       resolve();
     }
   });
@@ -415,27 +447,64 @@ function extractPriceFromElement(element) {
 
 // Function to convert a dollar amount to Robux
 function convertToRobux(dollarAmount) {
+  console.log('==== CONVERSION DEBUG ====');
+  console.log(`1. Original input: "${dollarAmount}"`);
+  
   // Clean the input to handle various formats
   let cleanedAmount = dollarAmount;
   
   // Replace common thousand separators and decimal points
-  cleanedAmount = cleanedAmount.replace(/\s/g, ''); // Remove spaces
+  cleanedAmount = cleanedAmount.replace(/\s/g, '');
+  console.log(`2. After removing spaces: "${cleanedAmount}"`);
   
   // Check for European format (1.234,56€)
-  if (/[\d.]+,\d{2}/.test(cleanedAmount)) {
-    cleanedAmount = cleanedAmount.replace(/\./g, '').replace(',', '.'); // Convert 1.234,56 to 1234.56
+  // European format has "." as thousand separator and "," as decimal point
+  // It must have dots followed by comma, and the comma must be followed by exactly 2 digits
+  // Example: 1.234,56 or 1.234.567,89
+  const hasCommaDecimal = /,\d{2}(?!\d)/.test(cleanedAmount);
+  const hasThousandsDots = /\d{1,3}(\.\d{3})+/.test(cleanedAmount);
+  const isEuropeanFormat = hasCommaDecimal && hasThousandsDots;
+  
+  console.log(`3. Format detection - hasCommaDecimal: ${hasCommaDecimal}, hasThousandsDots: ${hasThousandsDots}`);
+  
+  if (isEuropeanFormat) {
+    console.log(`4a. Detected European format (dots for thousands, comma for decimal)`);
+    cleanedAmount = cleanedAmount.replace(/\./g, '').replace(',', '.');
+    console.log(`4b. Converted to standard format: "${cleanedAmount}"`);
+  } else {
+    // US/UK format has "," as thousand separator and "." as decimal
+    // Just remove all commas
+    const noCommas = cleanedAmount.replace(/,/g, '');
+    console.log(`4c. Standard US/UK format - removing commas: "${noCommas}"`);
+    cleanedAmount = noCommas;
   }
   
-  // Remove currency signs, commas, and any other non-numeric characters except decimal point
+  // Now remove currency signs and any other non-numeric characters except decimal point
   const numericValue = parseFloat(cleanedAmount.replace(/[^\d.]/g, ''));
+  console.log(`5. Extracted numeric value: ${numericValue}`);
   
-  if (isNaN(numericValue)) return dollarAmount;
+  if (isNaN(numericValue)) {
+    console.log('ERROR: Could not extract a valid number!');
+    return dollarAmount;
+  }
+  
+  // Get the conversion rate
+  console.log(`6. Using conversion rate: ${robuxConversionRate} (${DEFAULT_ROBUX_AMOUNT} Robux = $${DEFAULT_DOLLAR_AMOUNT})`);
   
   // Convert to Robux using the loaded conversion rate
   const robuxAmount = numericValue * robuxConversionRate;
+  console.log(`7. Calculation: ${numericValue} × ${robuxConversionRate} = ${robuxAmount} Robux`);
+  
+  // Round to nearest whole number
+  const roundedAmount = Math.round(robuxAmount);
+  console.log(`8. Rounded amount: ${roundedAmount} Robux`);
   
   // Format with commas for thousands and add Robux icon
-  return formatNumberWithCommas(Math.round(robuxAmount)) + ` ${ROBUX_ICON_SVG}`;
+  const formattedAmount = formatNumberWithCommas(roundedAmount) + ` ${ROBUX_ICON_SVG}`;
+  console.log(`9. Final formatted output: "${formattedAmount}"`);
+  console.log('========================');
+  
+  return formattedAmount;
 }
 
 // Function to find and process site-specific patterns based on the current domain
@@ -834,13 +903,89 @@ document.addEventListener('convertToRobux', () => {
   findAndReplacePrices(true);
 });
 
+// Test conversion function directly
+function testConversion() {
+  console.log('===== TESTING CONVERSION CASES =====');
+  
+  // Define test cases: [input, expected numeric value]
+  const testCases = [
+    ['$114,799', 114799],       // US format with comma as thousands separator
+    ['$1,234.56', 1234.56],     // US format with decimal
+    ['1.234,56€', 1234.56],     // European format with dot as thousands and comma as decimal
+    ['£42.99', 42.99],          // UK price
+    ['123,456', 123456],        // Number with comma thousands separator
+    ['123456', 123456],         // Plain number
+    ['$114,799.99', 114799.99], // US format with comma and decimal
+    ['1.234.567,89 €', 1234567.89] // European format with multiple dots
+  ];
+  
+  // Run tests
+  for (const [input, expected] of testCases) {
+    console.log(`\nTesting: "${input}"`);
+    
+    // Get numeric value
+    let cleanedAmount = input.replace(/\s/g, '');
+    
+    // Check for European format
+    const hasCommaDecimal = /,\d{2}(?!\d)/.test(cleanedAmount);
+    const hasThousandsDots = /\d{1,3}(\.\d{3})+/.test(cleanedAmount);
+    const isEuropeanFormat = hasCommaDecimal && hasThousandsDots;
+    
+    console.log(`Format detection - hasCommaDecimal: ${hasCommaDecimal}, hasThousandsDots: ${hasThousandsDots}`);
+    
+    if (isEuropeanFormat) {
+      console.log(`European format detected`);
+      cleanedAmount = cleanedAmount.replace(/\./g, '').replace(',', '.');
+    } else {
+      console.log(`Standard US/UK format detected`);
+      cleanedAmount = cleanedAmount.replace(/,/g, '');
+    }
+    
+    const numericValue = parseFloat(cleanedAmount.replace(/[^\d.]/g, ''));
+    
+    // Calculate expected Robux
+    const expectedRobux = Math.round(expected * (DEFAULT_ROBUX_AMOUNT / DEFAULT_DOLLAR_AMOUNT));
+    const formattedExpected = formatNumberWithCommas(expectedRobux);
+    
+    console.log(`Numeric value: ${numericValue} (Expected: ${expected})`);
+    console.log(`Robux: ${formattedExpected}`);
+    
+    if (Math.abs(numericValue - expected) > 0.01) {
+      console.error(`❌ Test failed: Got ${numericValue}, expected ${expected}`);
+    } else {
+      console.log('✅ Test passed');
+    }
+  }
+  
+  console.log('\n===== END TESTING =====');
+}
+
+// Run test cases immediately
+testConversion();
+
 // Run the price finder when the DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
+    // Test the conversion of the problematic case
+    console.log('==== TEST CONVERSION ====');
+    const testCase = '$114,799';
+    console.log(`Testing conversion of: ${testCase}`);
+    const result = convertToRobux(testCase);
+    console.log(`Result: ${result}`);
+    console.log('==== END TEST ====');
+    
     setTimeout(() => findAndReplacePrices(true), 500);
     observePageChanges();
   });
 } else {
+  // Test the conversion of the problematic case
+  console.log('==== TEST CONVERSION ====');
+  const testCase = '$114,799';
+  console.log(`Testing conversion of: ${testCase}`);
+  const result = convertToRobux(testCase);
+  console.log(`Result: ${result}`);
+  console.log('==== END TEST ====');
+  
   setTimeout(() => findAndReplacePrices(true), 500);
   observePageChanges();
 } 
